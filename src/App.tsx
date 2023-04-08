@@ -33,6 +33,7 @@ const GlobalStyle = createGlobalStyle`
   }
   a {
     text-decoration: none;
+    color: inherit;
   }
   ul {
     list-style:none;
