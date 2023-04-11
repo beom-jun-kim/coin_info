@@ -1,6 +1,9 @@
 import { useLocation, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
+import Price from "./Price";
+import Chart from "./Chart";
 
 const Title = styled.h1`
   color: ${(props) => props.theme.bgColor};
@@ -102,7 +105,6 @@ function Coin() {
     })();
   }, [coinId]);
 
-
   return (
     <Container>
       <Header>
@@ -112,11 +114,14 @@ function Coin() {
         "Loading..."
       ) : (
         <div>
-          {info.map((coin) => (
-            <div>{coin.name}</div>
-          ))}
+          {info?.name} {priceInfo?.quotes.USD.ath_price}
         </div>
       )}
+
+      <Routes>
+        <Route path="Chart" element={<Chart />} />
+        <Route path="Price" element={<Price />} />
+      </Routes>
     </Container>
   );
 }
