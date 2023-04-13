@@ -1,13 +1,16 @@
 import {
-  BrowserRouter,
   Routes,
   Route,
   useLocation,
   useParams,
-  Outlet,
+  useMatch,
+  Link,
 } from "react-router-dom";
-import { useEffect, useState } from "react";
 import styled from "styled-components";
+import { useQuery } from "react-query";
+import Price from "./Price";
+import Chart from "./Chart";
+import { fetchCoinInfo, fetchCoinPrice } from "./api";
 
 const Overview = styled.div`
   display: flex;
@@ -48,6 +51,27 @@ const Header = styled.header`
   margin-bottom: 20px;
   background: ${(props) => props.theme.textColor};
   height: 100px;
+`;
+
+const Tabs = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 20px;
+`;
+
+const Tab = styled.span<{ isActive: boolean }>`
+  text-align: center;
+  width: 49.5%;
+  color: ${(props) =>
+    props.isActive ? props.theme.accentColor : props.theme.textColor};
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  a {
+    display: block;
+    height: 50px;
+    line-height: 50px;
+  }
 `;
 
 interface RouterState {
@@ -110,26 +134,25 @@ interface PriceData {
 }
 
 function Coin() {
-  const [loading, setLoading] = useState(true);
-  const [info, setInfo] = useState<InfoData>();
-  const [priceInfo, setPriceInfo] = useState<PriceData>();
   const { coinId } = useParams();
   const location = useLocation();
   const name = location.state as RouterState;
   const nameStr = JSON.stringify(name).replace(/"/g, "");
-  useEffect(() => {
-    (async () => {
-      const infoData = await (
-        await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-      ).json();
-      const priceData = await (
-        await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-      ).json();
-      setInfo(infoData);
-      setPriceInfo(priceData);
-      setLoading(false);
-    })();
-  }, [coinId]);
+
+  // useMatch : url 경로 이름에 대해 경로 패턴을 일치시키고 일치에 대한 정보 반환
+  const priceMatch = useMatch("/:coinId/price");
+  const chartMatch = useMatch("/:coinId/chart");
+
+  const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
+    ["info", coinId],
+    () => fetchCoinInfo(coinId!)
+  );
+  const { isLoading: priceLoading, data: priceDate } = useQuery<PriceData>(
+    ["price", coinId],
+    () => fetchCoinPrice(coinId!)
+  );
+
+  const loading = infoLoading || priceLoading;
 
   return (
     <Container>
@@ -143,30 +166,43 @@ function Coin() {
           <Overview>
             <OverviewItem>
               <span>Rank:</span>
-              <span>{info?.rank}</span>
+              <span>{infoData?.rank}</span>
             </OverviewItem>
             <OverviewItem>
               <span>Symbol:</span>
-              <span>${info?.symbol}</span>
+              <span>${infoData?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
               <span>Open Source:</span>
-              <span>{info?.open_source ? "Yes" : "No"}</span>
+              <span>{infoData?.open_source ? "Yes" : "No"}</span>
             </OverviewItem>
           </Overview>
-          <Description>{info?.description}</Description>
+
+          <Description>{infoData?.description}</Description>
 
           <Overview>
             <OverviewItem>
               <span>Total Suply:</span>
-              <span>{priceInfo?.total_supply}</span>
+              <span>{priceDate?.total_supply}</span>
             </OverviewItem>
             <OverviewItem>
               <span>Max Supply:</span>
-              <span>{priceInfo?.max_supply}</span>
+              <span>{priceDate?.max_supply}</span>
             </OverviewItem>
           </Overview>
-          <Outlet />
+
+          <Tabs>
+            <Tab isActive={chartMatch !== null}>
+              <Link to={`/${coinId}/chart`}>Chart</Link>
+            </Tab>
+            <Tab isActive={priceMatch !== null}>
+              <Link to={`/${coinId}/price`}>Price</Link>
+            </Tab>
+          </Tabs>
+          <Routes>
+            <Route path="chart" element={coinId ? <Chart coinId={coinId}/> : null} />
+            <Route path="price" element={<Price />} />
+          </Routes>
         </>
       )}
     </Container>
