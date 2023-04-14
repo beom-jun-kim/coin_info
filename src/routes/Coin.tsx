@@ -11,6 +11,7 @@ import { useQuery } from "react-query";
 import Price from "./Price";
 import Chart from "./Chart";
 import { fetchCoinInfo, fetchCoinPrice } from "./api";
+import {Helmet} from "react-helmet";
 
 const Overview = styled.div`
   display: flex;
@@ -149,13 +150,21 @@ function Coin() {
   );
   const { isLoading: priceLoading, data: priceDate } = useQuery<PriceData>(
     ["price", coinId],
-    () => fetchCoinPrice(coinId!)
+    () => fetchCoinPrice(coinId!),
+
+    // 세번째 인자 : 밀리초로 업데이트 가능
+    {
+      refetchInterval:5000,
+    }
   );
 
   const loading = infoLoading || priceLoading;
 
   return (
     <Container>
+      <Helmet>
+        <title>{nameStr}</title>
+      </Helmet>
       <Header>
         <Title>{nameStr}</Title>
       </Header>
@@ -173,8 +182,8 @@ function Coin() {
               <span>${infoData?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Open Source:</span>
-              <span>{infoData?.open_source ? "Yes" : "No"}</span>
+              <span>price:</span>
+              <span>{priceDate?.quotes.USD.price}</span>
             </OverviewItem>
           </Overview>
 

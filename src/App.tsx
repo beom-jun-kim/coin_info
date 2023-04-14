@@ -1,6 +1,6 @@
 import Router from "./Router";
 import { createGlobalStyle } from "styled-components";
-import {ReactQueryDevtools} from "react-query/devtools"; /* query 확인 (캐싱된 date) */
+import { ReactQueryDevtools } from "react-query/devtools"; /* query 확인 (캐싱된 date) */
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
@@ -45,8 +45,8 @@ function App() {
   return (
     <>
       <GlobalStyle />
-      <Router />
-      <ReactQueryDevtools initialIsOpen={true}/>
+        <Router />
+      <ReactQueryDevtools initialIsOpen={true} />
     </>
   );
 }

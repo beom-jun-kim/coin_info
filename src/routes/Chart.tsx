@@ -1,6 +1,8 @@
 import { useQuery } from "react-query";
 import { fetchCoinHistory } from "./api";
-import ApexCharts from "apexcharts";
+import ReactApexCharts from "react-apexcharts";
+import {Helmet} from "react-helmet";
+
 
 interface IData {
   time_open: string;
@@ -23,15 +25,19 @@ function Chart({ coinId }: ChartProps) {
   );
   return (
     <div>
+      <Helmet>
+          <title>Chart</title>
+      </Helmet>
       {isLoading ? (
         "차트 로딩 중..."
       ) : (
-        <ApexCharts
+        <ReactApexCharts
+          style={{"margin-top": 20}}
           type="line"
           series={[
             {
-              name: "hello",
-              data: [1, 2, 3, 4, 5],
+              name: "price",
+              data: data?.map((price) => Number(price.close)) as number[],
             },
           ]}
           options={{
@@ -41,7 +47,23 @@ function Chart({ coinId }: ChartProps) {
             chart: {
               height: 100,
               width: 500,
+              toolbar: {
+                show:false,
+              }
             },
+            stroke: {
+              curve:"smooth",
+              width:4,
+            },
+            xaxis:{
+              type:"datetime",
+              categories:data?.map((price) => price.time_close),
+            },
+            fill:{
+              type:"gradient",
+              gradient:{gradientToColors:["skyblue"]},
+            },
+            colors:["blue"],
           }}
         />
       )}

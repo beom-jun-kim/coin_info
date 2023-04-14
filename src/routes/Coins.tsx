@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { fetchCoins } from "./api";
+import { Helmet } from "react-helmet";
 
 const Title = styled.h1`
   color: ${(props) => props.theme.bgColor};
@@ -54,11 +55,13 @@ interface ICoin {
 }
 
 function Coins() {
+  const { isLoading, data } = useQuery<ICoin[]>("allCoins", fetchCoins);
 
-  const {isLoading , data} = useQuery<ICoin[]>("allCoins", fetchCoins);
-   
   return (
     <Container>
+      <Helmet>
+        <title>Coins</title>
+      </Helmet>
       <Header>
         <Title>COINS</Title>
       </Header>
