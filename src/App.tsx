@@ -1,6 +1,10 @@
 import Router from "./Router";
 import { createGlobalStyle } from "styled-components";
 import { ReactQueryDevtools } from "react-query/devtools"; /* query 확인 (캐싱된 date) */
+import { ThemeProvider } from "styled-components";
+import { lightTheme,darkTheme } from "./theme";
+import {useRecoilValue} from "recoil";
+import { isDarkAtom } from "./atoms";
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
@@ -42,11 +46,17 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 function App() {
+
+  // useRecoilValue(state) : Recoil state값 반환 (value 감지)
+  // 업데이트 될 때 리렌더링
+  const isDark = useRecoilValue(isDarkAtom)
   return (
     <>
-      <GlobalStyle />
+      <ThemeProvider theme ={isDark ? darkTheme : lightTheme}>
+        <GlobalStyle />
         <Router />
-      <ReactQueryDevtools initialIsOpen={true} />
+        <ReactQueryDevtools initialIsOpen={true} />
+      </ThemeProvider>
     </>
   );
 }

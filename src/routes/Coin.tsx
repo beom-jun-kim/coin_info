@@ -137,12 +137,14 @@ interface PriceData {
 function Coin() {
   const { coinId } = useParams();
   const location = useLocation();
-  const name = location.state as RouterState;
+  const name = location.state as RouterState || `${coinId}`.slice(4);
   const nameStr = JSON.stringify(name).replace(/"/g, "");
 
   // useMatch : url 경로 이름에 대해 경로 패턴을 일치시키고 일치에 대한 정보 반환
   const priceMatch = useMatch("/:coinId/price");
+  console.log("priceMatch",priceMatch);
   const chartMatch = useMatch("/:coinId/chart");
+  console.log("chartMatch",chartMatch);
 
   const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
     ["info", coinId],
