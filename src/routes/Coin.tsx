@@ -137,7 +137,7 @@ interface PriceData {
 function Coin() {
   const { coinId } = useParams();
   const location = useLocation();
-  const name = location.state as RouterState || `${coinId}`.slice(4);
+  const name = location.state as RouterState;
   const nameStr = JSON.stringify(name).replace(/"/g, "");
 
   // useMatch : url 경로 이름에 대해 경로 패턴을 일치시키고 일치에 대한 정보 반환
@@ -204,10 +204,10 @@ function Coin() {
 
           <Tabs>
             <Tab isActive={chartMatch !== null}>
-              <Link to={`/${coinId}/chart`}>Chart</Link>
+              <Link to={`/${coinId}/chart`} state={`${location.state}`}>Chart</Link>
             </Tab>
             <Tab isActive={priceMatch !== null}>
-              <Link to={`/${coinId}/price`}>Price</Link>
+              <Link to={`/${coinId}/price`} state={`${location.state}`}>Price</Link>
             </Tab>
           </Tabs>
           <Routes>
